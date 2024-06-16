@@ -1712,7 +1712,7 @@ MonoBehaviour:
   m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1366, y: 778}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 1
   m_PhysicalUnit: 3
@@ -17207,6 +17207,7 @@ MonoBehaviour:
   Confetti1: {fileID: 1266685467}
   RestartButon: {fileID: 1308954353}
   timr: {fileID: 1851548513}
+  activeInputFields: 0
   Keys: {fileID: 1191917704}
   pauseMenu: {fileID: 626964487}
 --- !u!4 &1656623029
@@ -17507,6 +17508,7 @@ MonoBehaviour:
   - {fileID: 1068770569}
   - {fileID: 787212044}
   InputfieldManager: {fileID: 1656623028}
+  HardInputfieldManager: {fileID: 0}
   wordsList: []
 --- !u!1 &1764103376
 GameObject:

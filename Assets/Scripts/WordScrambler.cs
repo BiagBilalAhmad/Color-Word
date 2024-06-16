@@ -2,17 +2,17 @@ using UnityEngine;
 using TMPro;
 using System.Collections.Generic;
 using System.IO;
+using System.Collections;
+using UnityEngine.Networking;
 
 [System.Serializable]
 public class WordScrambler : MonoBehaviour
 {
-   // public List<string> wordsList; // List of words to choose from
     public TMP_Text scrambledWordText; // Reference to TMP Text component to display scrambled word
     public float characterSpacing = 5f; // Adjustable character spacing
 
     private string selectedWord; // The word selected from the list
     private string scrambledWord; // The scrambled version of the selected word
-    private string scrambledWordforColor; // The scrambled version of the selected word
     private float missingCharacterProbability = 0.5f;
     private int maxMissingCharacters = 3;
 
@@ -21,32 +21,42 @@ public class WordScrambler : MonoBehaviour
     public HardModeInputFieldManager HardInputfieldManager;
     public List<string> wordsList;
 
+    private string jsonFileName = "words.json";
+    private string jsonFilePath;
+
     void Start()
     {
-        LoadWordsFromJSON();
-        SelectWord();
-        ScrambleWord();
-        DisplayScrambledWord();
-        InputfieldManager?.Initialise();
-        HardInputfieldManager?.Initialise();
+        StartCoroutine(LoadWordsFromJSON());
     }
-    void LoadWordsFromJSON()
-    {
-        string filePath = Path.Combine(Application.streamingAssetsPath, "words.json");
 
-        if (File.Exists(filePath))
+    IEnumerator LoadWordsFromJSON()
+    {
+        jsonFilePath = Path.Combine(Application.streamingAssetsPath, jsonFileName);
+
+        UnityWebRequest request = UnityWebRequest.Get(jsonFilePath);
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
         {
-            string json = File.ReadAllText(filePath);
+            string json = request.downloadHandler.text;
             WordList wordList = JsonUtility.FromJson<WordList>(json);
 
             // Assign the words from JSON to the wordsList
             wordsList = wordList.words;
+
+            // Proceed with the game setup
+            SelectWord();
+            ScrambleWord();
+            DisplayScrambledWord();
+            InputfieldManager?.Initialise();
+            HardInputfieldManager?.Initialise();
         }
         else
         {
-            Debug.LogError("File not found: " + filePath);
+            Debug.LogError("Error loading JSON file: " + request.error);
         }
     }
+
     void SelectWord()
     {
         // Randomly select a word from the list
@@ -99,9 +109,7 @@ public class WordScrambler : MonoBehaviour
 
         // Convert the char array back to a string
         scrambledWord = new string(chars);
-       // Debug.Log(scrambledWord.Length);
     }
-
 
     void DisplayScrambledWord()
     {
@@ -114,13 +122,9 @@ public class WordScrambler : MonoBehaviour
             {-5, new Color(213f/255f, 0f, 3f/255f)},   // Dark red
             {-4, new Color(255f/255f, 104f/255f, 48f/255f)},   // Dark orange
             {-3, new Color(255f/255f, 163f/255f, 25f/255f)},   // Light Orange
-            //{-3, new Color(255f/255f, 165f/255f, 45f/255f)},   // Light Orange
             {-2, new Color(255f/255f, 247f/255f, 89f/255f)},   // Yellow
-            //{-2, new Color(255f/255f, 247f/255f, 89f/255f)},   // Yellow
             {-1, new Color(165f/255f, 252f/255f, 3f/255f)},  // Light Green
-           // {-1, new Color(192f/255f, 255f/255f, 114f/255f)},  // Light Green
             {1, new Color(82f/255f, 252f/255f, 3f/255f)},    // Green
-            //{1, new Color(126f/255f, 217f/255f, 87f/255f)},    // Green
             {2, new Color(93f/255f, 225f/255f, 230f/255f)},    // Turquoise
             {3, new Color(55f/255f, 182f/255f, 255f/255f)},    // Light blue
             {4, new Color(6f/255f, 128f/255f, 255f/255f)},     // Mid blue
@@ -173,13 +177,9 @@ public class WordScrambler : MonoBehaviour
         }
     }
 
-
     [System.Serializable]
     public class WordList
     {
         public List<string> words;
     }
 }
-
-
-
