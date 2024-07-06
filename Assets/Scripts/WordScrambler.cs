@@ -82,7 +82,8 @@ public class WordScrambler : MonoBehaviour
         // Add the first one or two indices to the non-scrambled set
         for (int i = 0; i < Mathf.Min(2, chars.Length); i++)
         {
-            nonScrambledIndices.Add(i);
+            int corrIndex = Random.Range(0, chars.Length + 1);
+            nonScrambledIndices.Add(corrIndex);
         }
 
         // Randomly shuffle characters except for the non-scrambled ones

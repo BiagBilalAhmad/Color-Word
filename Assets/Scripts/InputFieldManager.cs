@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine.SceneManagement;
 using DG.Tweening; // Import DOTween namespace
 using UnityEngine.EventSystems;
+
 public class InputFieldManager : MonoBehaviour
 {
     public TMP_InputField[] inputFields;
@@ -23,6 +24,7 @@ public class InputFieldManager : MonoBehaviour
     public GameObject Keys;
 
     public GameObject pauseMenu;
+
     void Start()
     {
         ResumeGame();
@@ -40,6 +42,7 @@ public class InputFieldManager : MonoBehaviour
             keyboardButtons[i].onClick.AddListener(delegate { OnKeyboardButtonClick(index); });
         }
     }
+
     void Update()
     {
         // Check for mouse clicks
@@ -51,25 +54,40 @@ public class InputFieldManager : MonoBehaviour
                 TMP_InputField clickedInputField = selectedObject.GetComponent<TMP_InputField>();
                 if (clickedInputField != null)
                 {
-
                     // Find the index of the clicked input field
                     for (int i = 0; i < inputFields.Length; i++)
                     {
                         if (inputFields[i] == clickedInputField)
                         {
                             currentActiveInputFieldIndex = i;
-                            //activeInputField.text.;
                             activeInputField = inputFields[i];
-
-                            //activeInputField.text = "";
                             Debug.Log("Clicked input field: " + i);
                             break;
                         }
                     }
                 }
+                else
+                {
+                    SetInputFieldFocus(currentActiveInputFieldIndex);
+                }
+            }
+            else
+            {
+                SetInputFieldFocus(currentActiveInputFieldIndex);
             }
         }
+
+        // Check for arrow key input
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            MoveFocusLeft();
+        }
+        else if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            MoveFocusRight();
+        }
     }
+
     public void Initialise()
     {
         correctWord = wordScrambler.CorrectWord();
@@ -93,10 +111,8 @@ public class InputFieldManager : MonoBehaviour
 
     void OnInputValueChanged(int index)
     {
-
         if (index < activeInputFields)
         {
-
             // Check if the entered character matches the correct character
             if (inputFields[index].text == correctWord[index].ToString())
             {
@@ -128,8 +144,13 @@ public class InputFieldManager : MonoBehaviour
             }
 
             // Move to the next input field when a character is entered
-
-            SetInputFieldFocus(index + 1);
+            if(!Input.GetKeyDown(KeyCode.Backspace))
+                SetInputFieldFocus(index + 1);
+            else
+            {
+                if(index > 0)
+                    SetInputFieldFocus(index - 1);
+            }
 
             // If all input fields have been filled
             if (correctCount == correctWord.Length)
@@ -154,18 +175,18 @@ public class InputFieldManager : MonoBehaviour
     {
         if (activeInputField != null)
         {
-            if (index == 26) // Backspace button
-            {
-                if (activeInputField.text.Length > 0)
-                {
-                    activeInputField.text = activeInputField.text.Substring(0, activeInputField.text.Length - 1);
-                }
-            }
-            else
-            {
-                // Clear the existing text before appending the new character
-                activeInputField.text = keyboardButtons[index].GetComponentInChildren<TMP_Text>().text;
-            }
+            //if (index == 26) // Backspace button
+            //{
+            //    if (activeInputField.text.Length > 0)
+            //    {
+            //        activeInputField.text = activeInputField.text.Substring(0, activeInputField.text.Length - 1);
+            //    }
+            //}
+            //else
+            //{
+            // Clear the existing text before appending the new character
+            activeInputField.text = keyboardButtons[index].GetComponentInChildren<TMP_Text>().text;
+            //}
 
             activeInputField.ActivateInputField();
         }
@@ -178,6 +199,23 @@ public class InputFieldManager : MonoBehaviour
             inputFields[index].Select();
             inputFields[index].ActivateInputField();
             activeInputField = inputFields[index]; // Set the active input field
+            currentActiveInputFieldIndex = index; // Update the active input field index
+        }
+    }
+
+    void MoveFocusLeft()
+    {
+        if (currentActiveInputFieldIndex > 0)
+        {
+            SetInputFieldFocus(currentActiveInputFieldIndex - 1);
+        }
+    }
+
+    void MoveFocusRight()
+    {
+        if (currentActiveInputFieldIndex < activeInputFields - 1)
+        {
+            SetInputFieldFocus(currentActiveInputFieldIndex + 1);
         }
     }
 

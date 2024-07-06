@@ -202,7 +202,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 117, y: -210.3}
+  m_AnchoredPosition: {x: 96, y: -210.3}
   m_SizeDelta: {x: 100, y: 27.57}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &113782113
@@ -309,6 +309,7 @@ GameObject:
   m_Component:
   - component: {fileID: 396751605}
   - component: {fileID: 396751606}
+  - component: {fileID: 396751607}
   m_Layer: 5
   m_Name: Music-Toggle
   m_TagString: Untagged
@@ -333,7 +334,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 139, y: -54.899994}
+  m_AnchoredPosition: {x: 160, y: -62.647003}
   m_SizeDelta: {x: 55.59, y: 55.207}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &396751606
@@ -383,9 +384,9 @@ MonoBehaviour:
   onValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 666105161}
-        m_TargetAssemblyTypeName: SoundManager, Assembly-CSharp
-        m_MethodName: ToggleMusic
+      - m_Target: {fileID: 396751607}
+        m_TargetAssemblyTypeName: ToggleMusic, Assembly-CSharp
+        m_MethodName: Togglemusic
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -395,8 +396,8 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 666105161}
-        m_TargetAssemblyTypeName: SoundManager, Assembly-CSharp
+      - m_Target: {fileID: 396751607}
+        m_TargetAssemblyTypeName: ToggleMusic, Assembly-CSharp
         m_MethodName: ToggleVolume
         m_Mode: 1
         m_Arguments:
@@ -408,6 +409,19 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
   m_IsOn: 1
+--- !u!114 &396751607
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 396751604}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a04f4c516024d5141b3fd9e12f06bb6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  toggle: {fileID: 396751606}
 --- !u!1 &666105160
 GameObject:
   m_ObjectHideFlags: 0
@@ -687,7 +701,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -117.8, y: -210.3}
+  m_AnchoredPosition: {x: -98, y: -210.3}
   m_SizeDelta: {x: 100, y: 27.57}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &710781642
@@ -1549,7 +1563,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 54.5, y: -54.899994}
+  m_AnchoredPosition: {x: 80.64502, y: -63}
   m_SizeDelta: {x: 53.12, y: 54.5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1819874154

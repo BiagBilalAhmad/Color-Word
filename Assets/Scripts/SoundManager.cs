@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -66,6 +64,23 @@ public class SoundManager : MonoBehaviour
     }
 
     public void ToggleMusic()
+    {
+        int toggle = musicToggle.isOn ? 1 : 0;
+        musicSource.volume = toggle;
+        PlayerPrefs.SetInt("Allow Music", toggle);
+    }
+
+    public void ToggleVolume(Toggle volumeToggle)
+    {
+        int toggle = volumeToggle.isOn ? 1 : 0;
+        if (toggle == 0)
+            audioSource.volume = toggle;
+        else
+            audioSource.volume = 0.4f;
+        PlayerPrefs.SetInt("Allow Volume", toggle);
+    }
+
+    public void ToggleMusic(Toggle musicToggle)
     {
         int toggle = musicToggle.isOn ? 1 : 0;
         musicSource.volume = toggle;

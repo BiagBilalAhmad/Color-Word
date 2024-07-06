@@ -60,23 +60,36 @@ public class HardModeInputFieldManager : MonoBehaviour
                 TMP_InputField clickedInputField = selectedObject.GetComponent<TMP_InputField>();
                 if (clickedInputField != null)
                 {
-
                     // Find the index of the clicked input field
                     for (int i = 0; i < inputFields.Length; i++)
                     {
                         if (inputFields[i] == clickedInputField)
                         {
                             currentActiveInputFieldIndex = i;
-                            //activeInputField.text.;
                             activeInputField = inputFields[i];
-
-                            //activeInputField.text = "";
                             Debug.Log("Clicked input field: " + i);
                             break;
                         }
                     }
                 }
+                else
+                {
+                    SetInputFieldFocus(currentActiveInputFieldIndex);
+                }
             }
+            else
+            {
+                SetInputFieldFocus(currentActiveInputFieldIndex);
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            MoveFocusLeft();
+        }
+        else if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            MoveFocusRight();
         }
     }
     public void Initialise()
@@ -102,7 +115,7 @@ public class HardModeInputFieldManager : MonoBehaviour
 
     void OnInputValueChanged(int index)
     {
-        if (index <= activeInputFields)
+        if (index < activeInputFields)
         {
             // Check if the entered character matches the correct character
             if (inputFields[index].text == correctWord[index].ToString())
@@ -130,7 +143,13 @@ public class HardModeInputFieldManager : MonoBehaviour
             }
 
             // Move to the next input field when a character is entered
+            if (!Input.GetKeyDown(KeyCode.Backspace))
                 SetInputFieldFocus(index + 1);
+            else
+            {
+                if (index > 0)
+                    SetInputFieldFocus(index - 1);
+            }
         }
     }
 
@@ -148,10 +167,8 @@ public class HardModeInputFieldManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("Try again! You have " + correctCount + " correct guesses.");
-
             SoundManager.instance?.PlayWrongClickSound();
-            // Add your logic for what happens when the word is not guessed correctly
+
             foreach (var inputfield in inputFields)
             {
                 inputfield.text = string.Empty;
@@ -169,6 +186,8 @@ public class HardModeInputFieldManager : MonoBehaviour
             attempsText.text = attemp;
 
             SetInputFieldFocus(0);
+
+            Debug.Log("Try again! You have " + attemptCount + " correct guesses.");
         }
 
         if (attemptCount == 0)
@@ -183,18 +202,18 @@ public class HardModeInputFieldManager : MonoBehaviour
         {
             SoundManager.instance?.PlayCorrectClickSound();
 
-            if (index == 26) // Backspace button
-            {
-                if (activeInputField.text.Length > 0)
-                {
-                    activeInputField.text = activeInputField.text.Substring(0, activeInputField.text.Length - 1);
-                }
-            }
-            else
-            {
+            //if (index == 26) // Backspace button
+            //{
+            //    if (activeInputField.text.Length > 0)
+            //    {
+            //        activeInputField.text = activeInputField.text.Substring(0, activeInputField.text.Length - 1);
+            //    }
+            //}
+            //else
+            //{
                 // Clear the existing text before appending the new character
                 activeInputField.text = keyboardButtons[index].GetComponentInChildren<TMP_Text>().text;
-            }
+            //}
 
             activeInputField.ActivateInputField();
         }
@@ -202,11 +221,28 @@ public class HardModeInputFieldManager : MonoBehaviour
 
     void SetInputFieldFocus(int index)
     {
-        if (index < inputFields.Length - 1)
+        if (index < activeInputFields)
         {
             inputFields[index].Select();
             inputFields[index].ActivateInputField();
             activeInputField = inputFields[index]; // Set the active input field
+            currentActiveInputFieldIndex = index; // Update the active input field index
+        }
+    }
+
+    void MoveFocusLeft()
+    {
+        if (currentActiveInputFieldIndex > 0)
+        {
+            SetInputFieldFocus(currentActiveInputFieldIndex - 1);
+        }
+    }
+
+    void MoveFocusRight()
+    {
+        if (currentActiveInputFieldIndex < activeInputFields - 1)
+        {
+            SetInputFieldFocus(currentActiveInputFieldIndex + 1);
         }
     }
 
