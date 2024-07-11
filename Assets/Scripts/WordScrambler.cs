@@ -12,7 +12,7 @@ public class WordScrambler : MonoBehaviour
     public float characterSpacing = 5f; // Adjustable character spacing
 
     private string selectedWord; // The word selected from the list
-    private string scrambledWord; // The scrambled version of the selected word
+    [SerializeField] private string scrambledWord; // The scrambled version of the selected word
     private float missingCharacterProbability = 0.5f;
     private int maxMissingCharacters = 3;
 
@@ -70,28 +70,28 @@ public class WordScrambler : MonoBehaviour
 
     void ScrambleWord()
     {
-        // Convert the selected word to a char array
-        char[] chars = selectedWord.ToCharArray();
+        // Convert the selected word to a char List<char>
+        List<char> chars = new List<char>(selectedWord.ToCharArray());
 
         // Determine the number of characters to be missing based on the word length
-        int missingCount = Mathf.Min(Mathf.FloorToInt(chars.Length / 3f), maxMissingCharacters);
+        int missingCount = Mathf.Min(Mathf.FloorToInt(chars.Count / 3f), maxMissingCharacters);
 
         // Keep track of which characters should not be scrambled
         HashSet<int> nonScrambledIndices = new HashSet<int>();
 
-        // Add the first one or two indices to the non-scrambled set
-        for (int i = 0; i < Mathf.Min(2, chars.Length); i++)
+        // Add the one or two indices to the non-scrambled set
+        for (int i = 0; i < Mathf.Min(2, chars.Count); i++)
         {
-            int corrIndex = Random.Range(0, chars.Length + 1);
+            int corrIndex = Random.Range(0, chars.Count + 1);
             nonScrambledIndices.Add(corrIndex);
         }
 
         // Randomly shuffle characters except for the non-scrambled ones
-        for (int i = 0; i < chars.Length; i++)
+        for (int i = 0; i < chars.Count; i++)
         {
             if (!nonScrambledIndices.Contains(i))
             {
-                int randomIndex = Random.Range(i, chars.Length);
+                int randomIndex = Random.Range(i, chars.Count);
                 char temp = chars[randomIndex];
                 chars[randomIndex] = chars[i];
                 chars[i] = temp;
@@ -99,7 +99,7 @@ public class WordScrambler : MonoBehaviour
         }
 
         // Add input fields for all characters
-        for (int i = 0; i < chars.Length; i++)
+        for (int i = 0; i < chars.Count; i++)
         {
             Inputfields[i].SetActive(true);
             if (InputfieldManager)
@@ -108,8 +108,19 @@ public class WordScrambler : MonoBehaviour
                 HardInputfieldManager.activeInputFields++;
         }
 
+        // Add Random Letters inbetween Word
+        int randCount = Random.Range(2, 5);
+        for (int i = 0; i < randCount; i++)
+        {
+            char scrambledChar = (char)Random.Range(97, 123);
+            int randomPosition = Random.Range(0, chars.Count + 1);
+            chars.Insert(randomPosition, scrambledChar);
+        }
+
         // Convert the char array back to a string
-        scrambledWord = new string(chars);
+        scrambledWord = new string(chars.ToArray());
+
+        Debug.Log(scrambledWord +" - "+ scrambledWord.Length);
     }
 
     void DisplayScrambledWord()
@@ -133,12 +144,16 @@ public class WordScrambler : MonoBehaviour
             {-6, new Color(213f/255f,0f, 3f/255f)},          // Default color for distances less than -5
             {6, new Color(0f, 79f/255f, 255f/255f)}            // Default color for distances greater than 5
         };
+        char correctChar = ' ';
 
-        // Iterate through the original word
         for (int i = 0; i < selectedWord.Length; i++)
         {
-            char correctChar = selectedWord[i];
+            correctChar = selectedWord[i];
+        }
 
+        // Iterate through the original word
+        for (int i = 0; i < scrambledWord.Length; i++)
+        {
             // Check if the character is missing
             if (scrambledWord.Length > i && scrambledWord[i] != ' ')
             {
@@ -167,14 +182,22 @@ public class WordScrambler : MonoBehaviour
                 // Append character to the text with the appropriate color and underline
                 scrambledWordText.text += "<color=#" + ColorUtility.ToHtmlStringRGB(color) + ">" + scrambledChar + "</color>";
             }
-            else
-            {
-                // If character is missing, display a placeholder (e.g., '_') with underline
-                scrambledWordText.text += "<u>_</u>";
-            }
-
+            //else
+            //{
+            //    // If character is missing, display a placeholder (e.g., '_') with underline
+            //    scrambledWordText.text += "<u>_</u>";
+            //}
             // Add adjustable space between characters
             scrambledWordText.characterSpacing = characterSpacing;
+        }
+    }
+
+    private void AddRandomLettersToWord(char[] chars)
+    {
+        int randCount = Random.Range(2, 5);
+        for (int i = 0; i < randCount; i++)
+        {
+            chars[i] = (char)Random.Range(65, 91);
         }
     }
 

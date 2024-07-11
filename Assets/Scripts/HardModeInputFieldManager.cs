@@ -32,6 +32,9 @@ public class HardModeInputFieldManager : MonoBehaviour
     public GameObject gameOverPanel;
 
     public TextMeshProUGUI correctWordAnswer;
+
+    public bool gameStarted = false;
+
     void Start()
     {
         ResumeGame();
@@ -51,25 +54,32 @@ public class HardModeInputFieldManager : MonoBehaviour
     }
     void Update()
     {
-        // Check for mouse clicks
-        if (Input.GetMouseButtonDown(0))
+        if (gameStarted)
         {
-            GameObject selectedObject = EventSystem.current.currentSelectedGameObject;
-            if (selectedObject != null)
+            // Check for mouse clicks
+            if (Input.GetMouseButtonDown(0))
             {
-                TMP_InputField clickedInputField = selectedObject.GetComponent<TMP_InputField>();
-                if (clickedInputField != null)
+                GameObject selectedObject = EventSystem.current.currentSelectedGameObject;
+                if (selectedObject != null)
                 {
-                    // Find the index of the clicked input field
-                    for (int i = 0; i < inputFields.Length; i++)
+                    TMP_InputField clickedInputField = selectedObject.GetComponent<TMP_InputField>();
+                    if (clickedInputField != null)
                     {
-                        if (inputFields[i] == clickedInputField)
+                        // Find the index of the clicked input field
+                        for (int i = 0; i < inputFields.Length; i++)
                         {
-                            currentActiveInputFieldIndex = i;
-                            activeInputField = inputFields[i];
-                            Debug.Log("Clicked input field: " + i);
-                            break;
+                            if (inputFields[i] == clickedInputField)
+                            {
+                                currentActiveInputFieldIndex = i;
+                                activeInputField = inputFields[i];
+                                Debug.Log("Clicked input field: " + i);
+                                break;
+                            }
                         }
+                    }
+                    else
+                    {
+                        SetInputFieldFocus(currentActiveInputFieldIndex);
                     }
                 }
                 else
@@ -77,19 +87,15 @@ public class HardModeInputFieldManager : MonoBehaviour
                     SetInputFieldFocus(currentActiveInputFieldIndex);
                 }
             }
-            else
-            {
-                SetInputFieldFocus(currentActiveInputFieldIndex);
-            }
-        }
 
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            MoveFocusLeft();
-        }
-        else if (Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            MoveFocusRight();
+            if (Input.GetKeyDown(KeyCode.LeftArrow))
+            {
+                MoveFocusLeft();
+            }
+            else if (Input.GetKeyDown(KeyCode.RightArrow))
+            {
+                MoveFocusRight();
+            }
         }
     }
     public void Initialise()
@@ -159,6 +165,8 @@ public class HardModeInputFieldManager : MonoBehaviour
         if (correctCount == correctWord.Length)
         {
             Debug.Log("Congratulations! You guessed the correct word.");
+            gameStarted = false;
+            DisableInputFields();
             Confetti.Play();
             Confetti1.Play();
             RestartButon.SetActive(true);
@@ -201,20 +209,7 @@ public class HardModeInputFieldManager : MonoBehaviour
         if (activeInputField != null)
         {
             SoundManager.instance?.PlayCorrectClickSound();
-
-            //if (index == 26) // Backspace button
-            //{
-            //    if (activeInputField.text.Length > 0)
-            //    {
-            //        activeInputField.text = activeInputField.text.Substring(0, activeInputField.text.Length - 1);
-            //    }
-            //}
-            //else
-            //{
-                // Clear the existing text before appending the new character
-                activeInputField.text = keyboardButtons[index].GetComponentInChildren<TMP_Text>().text;
-            //}
-
+            activeInputField.text = keyboardButtons[index].GetComponentInChildren<TMP_Text>().text;
             activeInputField.ActivateInputField();
         }
     }
@@ -252,6 +247,14 @@ public class HardModeInputFieldManager : MonoBehaviour
         inputField.transform.DOShakePosition(0.5f, new Vector3(10, 0, 0), 10, 90, false);
     }
 
+    void DisableInputFields()
+    {
+        foreach (var item in inputFields)
+        {
+            item.interactable = false;
+        }
+    }
+
     public void RestartGame()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
@@ -260,12 +263,14 @@ public class HardModeInputFieldManager : MonoBehaviour
     public void PauseGame()
     {
         Time.timeScale = 0f;
+        gameStarted = false;
         pauseMenu.SetActive(true);
     }
 
     public void GameOver()
     {
         Time.timeScale = 0f;
+        gameStarted = false;
         correctWordAnswer.text = correctWord;
         gameOverPanel.SetActive(true);
     }
@@ -273,6 +278,7 @@ public class HardModeInputFieldManager : MonoBehaviour
     public void ResumeGame()
     {
         Time.timeScale = 1f;
+        gameStarted = true;
         pauseMenu.SetActive(false);
         gameOverPanel.SetActive(false);
     }

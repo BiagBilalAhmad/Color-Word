@@ -25,6 +25,8 @@ public class InputFieldManager : MonoBehaviour
 
     public GameObject pauseMenu;
 
+    public bool gameStarted = false;
+
     void Start()
     {
         ResumeGame();
@@ -45,25 +47,32 @@ public class InputFieldManager : MonoBehaviour
 
     void Update()
     {
-        // Check for mouse clicks
-        if (Input.GetMouseButtonDown(0))
+        if (gameStarted)
         {
-            GameObject selectedObject = EventSystem.current.currentSelectedGameObject;
-            if (selectedObject != null)
+            // Check for mouse clicks
+            if (Input.GetMouseButtonDown(0))
             {
-                TMP_InputField clickedInputField = selectedObject.GetComponent<TMP_InputField>();
-                if (clickedInputField != null)
+                GameObject selectedObject = EventSystem.current.currentSelectedGameObject;
+                if (selectedObject != null)
                 {
-                    // Find the index of the clicked input field
-                    for (int i = 0; i < inputFields.Length; i++)
+                    TMP_InputField clickedInputField = selectedObject.GetComponent<TMP_InputField>();
+                    if (clickedInputField != null)
                     {
-                        if (inputFields[i] == clickedInputField)
+                        // Find the index of the clicked input field
+                        for (int i = 0; i < inputFields.Length; i++)
                         {
-                            currentActiveInputFieldIndex = i;
-                            activeInputField = inputFields[i];
-                            Debug.Log("Clicked input field: " + i);
-                            break;
+                            if (inputFields[i] == clickedInputField)
+                            {
+                                currentActiveInputFieldIndex = i;
+                                activeInputField = inputFields[i];
+                                Debug.Log("Clicked input field: " + i);
+                                break;
+                            }
                         }
+                    }
+                    else
+                    {
+                        SetInputFieldFocus(currentActiveInputFieldIndex);
                     }
                 }
                 else
@@ -71,20 +80,16 @@ public class InputFieldManager : MonoBehaviour
                     SetInputFieldFocus(currentActiveInputFieldIndex);
                 }
             }
-            else
-            {
-                SetInputFieldFocus(currentActiveInputFieldIndex);
-            }
-        }
 
-        // Check for arrow key input
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            MoveFocusLeft();
-        }
-        else if (Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            MoveFocusRight();
+            // Check for arrow key input
+            if (Input.GetKeyDown(KeyCode.LeftArrow))
+            {
+                MoveFocusLeft();
+            }
+            else if (Input.GetKeyDown(KeyCode.RightArrow))
+            {
+                MoveFocusRight();
+            }
         }
     }
 
@@ -156,17 +161,17 @@ public class InputFieldManager : MonoBehaviour
             if (correctCount == correctWord.Length)
             {
                 Debug.Log("Congratulations! You guessed the correct word.");
+                gameStarted = false;
+                DisableInputFields();
                 Confetti.Play();
                 Confetti1.Play();
                 RestartButon.SetActive(true);
                 timr.enabled = false;
                 Keys.SetActive(false);
-                // Add your logic for what happens when the word is guessed correctly
             }
             else
             {
                 Debug.Log("Try again! You have " + correctCount + " correct guesses.");
-                // Add your logic for what happens when the word is not guessed correctly
             }
         }
     }
@@ -175,19 +180,7 @@ public class InputFieldManager : MonoBehaviour
     {
         if (activeInputField != null)
         {
-            //if (index == 26) // Backspace button
-            //{
-            //    if (activeInputField.text.Length > 0)
-            //    {
-            //        activeInputField.text = activeInputField.text.Substring(0, activeInputField.text.Length - 1);
-            //    }
-            //}
-            //else
-            //{
-            // Clear the existing text before appending the new character
             activeInputField.text = keyboardButtons[index].GetComponentInChildren<TMP_Text>().text;
-            //}
-
             activeInputField.ActivateInputField();
         }
     }
@@ -225,6 +218,14 @@ public class InputFieldManager : MonoBehaviour
         inputField.transform.DOShakePosition(0.5f, new Vector3(10, 0, 0), 10, 90, false);
     }
 
+    void DisableInputFields()
+    {
+        foreach (var item in inputFields)
+        {
+            item.interactable = false;
+        }
+    }
+
     public void RestartGame()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
@@ -233,12 +234,14 @@ public class InputFieldManager : MonoBehaviour
     public void PauseGame()
     {
         Time.timeScale = 0f;
+        gameStarted = false;
         pauseMenu.SetActive(true);
     }
 
     public void ResumeGame()
     {
         Time.timeScale = 1f;
+        gameStarted = true;
         pauseMenu.SetActive(false);
     }
 
